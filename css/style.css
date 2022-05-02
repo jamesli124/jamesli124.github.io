@@ -1,0 +1,63 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+}
+
+/*
+.header, .navbar, .row, .footer {
+    
+}*/
+
+.header {
+    background-color: cadetblue;
+    padding: 80px;
+    text-align: center;
+    color: white;
+}
+
+.navbar {
+    background-color: dimgray;
+    overflow: hidden;
+}
+
+.navbar a.left {
+    float: left;
+}
+
+.navbar a {
+    float: right;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: gray;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.col {
+    flex: 50%;
+    padding: 20px;
+}
+
+.james-portrait {
+    width: 100%;
+    overflow: hidden
+
+}
+
+.footer {
+    background-color: cadetblue;
+}
