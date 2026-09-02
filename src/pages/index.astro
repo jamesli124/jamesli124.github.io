@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionCard from '../components/SectionCard.astro';
+import { site, nav } from '../data/site';
+import { externalAttrs, isExternal } from '../lib/links';
+
+/**
+ * The homepage "Recent" rail. Hand-curated on purpose: it is short enough that
+ * keeping it current by hand is easier than wiring it to four different
+ * sources, and it lets you promote whatever matters this month.
+ */
+const recent = [
+  {
+    title: 'FinaleToolkit in Bioinformatics Advances',
+    meta: 'Publication · 2025',
+    href: 'https://doi.org/10.1093/bioadv/vbaf236',
+  },
+  {
+    title: 'Extradigital glomus tumor after total knee arthroplasty',
+    meta: 'Case report · 2026',
+    href: 'https://renaissance.stonybrookmedicine.edu/orthopaedics/journal/2026/Li',
+  },
+  { title: 'Pediatric fractures and neighborhood-level SDOH', meta: 'In progress · Lurie', href: '/cv#research' },
+];
+---
+
+<Base>
+  <div class="wrap">
+    <section class="hero">
+      <p class="label">{site.name}</p>
+      <h1 class="display">
+        Medicine, and the<br />machines we point at it.
+      </h1>
+      <p class="lede prose">
+        I'm a medical student at Northwestern Feinberg interested in the computational future of medicine. Current projects include cfDNA fragmentomics for prediction of pre-term birth, automated literature search and evidence synthesis, and epidemiology of pediatric truama.
+      </p>
+    </section>
+
+    <section class="sections" aria-label="Sections">
+      {
+        nav.map((item, i) => (
+          <SectionCard index={i + 1} label={item.label} href={item.href} blurb={item.blurb} />
+        ))
+      }
+    </section>
+
+    <section class="recent" aria-labelledby="recent-heading">
+      <div class="section-rule">
+        <h2 id="recent-heading" class="label">Recent</h2>
+      </div>
+      <ul class="index-list">
+        {
+          recent.map((item, i) => (
+            <li>
+              <a href={item.href} {...externalAttrs(item.href)}>
+                <span class="index-num">{String(i + 1).padStart(2, '0')}</span>
+                <span>
+                  {item.title}
+                  {isExternal(item.href) && (
+                    <span class="visually-hidden"> (opens in a new tab)</span>
+                  )}
+                </span>
+                <span class="index-meta">{item.meta}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(1rem, 0.5rem + 3vw, 3rem) clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hero .label {
+    margin: 0 0 1.2rem;
+  }
+
+  .hero .display {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero .lede {
+    margin: 0;
+  }
+
+  .sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-top: 0;
+    margin-bottom: 4rem;
+  }
+
+  /* Cards share hairlines rather than each drawing their own box. */
+  .sections :global(.card) {
+    border: 0;
+  }
+
+  .recent {
+    max-width: 46rem;
+  }
+</style>

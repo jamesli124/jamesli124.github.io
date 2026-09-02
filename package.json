@@ -1,0 +1,19 @@
+{
+  "name": "jamesli124.github.io",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "@fontsource-variable/newsreader": "^5.1.0",
+    "astro": "^5.1.1",
+    "sharp": "^0.33.5"
+  }
+}

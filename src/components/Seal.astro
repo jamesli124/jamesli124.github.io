@@ -1,0 +1,42 @@
+---
+import { seal } from '../data/site';
+
+interface Props {
+  /** Rendered size in px. The seal is square. */
+  size?: number;
+  class?: string;
+}
+
+const { size = 44, class: className } = Astro.props;
+---
+
+{
+  seal && (
+    <img
+      class:list={['seal', className]}
+      src={seal.src}
+      width={size}
+      height={size}
+      /* Decorative: the name is always adjacent, so it adds nothing for a
+         screen reader and would only be noise. */
+      alt=""
+      aria-hidden="true"
+    />
+  )
+}
+
+<style>
+  .seal {
+    display: block;
+    flex: none;
+    /* A seal is stamped in ink; it should not glow on a dark ground. Slight
+       lift in dark mode keeps the red from muddying against near-black. */
+    filter: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .seal {
+      filter: brightness(1.15) saturate(1.05);
+    }
+  }
+</style>

@@ -1,0 +1,67 @@
+---
+interface Props {
+  index: number;
+  label: string;
+  href: string;
+  blurb?: string;
+}
+const { index, label, href, blurb } = Astro.props;
+const num = String(index).padStart(2, '0');
+---
+
+<a class="card" href={href}>
+  <span class="num">{num}</span>
+  <h3 class="title">{label}</h3>
+  {blurb && <p class="blurb">{blurb}</p>}
+  <span class="go" aria-hidden="true">→</span>
+</a>
+
+<style>
+  .card {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 0.4rem;
+    padding: 1.4rem 1.4rem 1.2rem;
+    border: 1px solid var(--rule);
+    background: var(--paper-raised);
+    text-decoration: none;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+
+  .card:hover {
+    border-color: var(--rule-strong);
+    transform: translateY(-2px);
+  }
+
+  .card:hover .go {
+    transform: translateX(4px);
+  }
+
+  .num {
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .title {
+    font-size: var(--step-2);
+    letter-spacing: -0.02em;
+  }
+
+  .blurb {
+    margin: 0.15rem 0 0.9rem;
+    font-size: var(--step--1);
+    line-height: 1.55;
+    color: var(--ink-muted);
+    font-family: var(--font-sans);
+  }
+
+  .go {
+    justify-self: start;
+    color: var(--accent);
+    transition: transform var(--transition);
+  }
+</style>

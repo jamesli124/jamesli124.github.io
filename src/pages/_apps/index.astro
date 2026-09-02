@@ -1,0 +1,133 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/**
+ * STUB — structure only.
+ *
+ * To build a real app page:
+ *   1. `npx astro add react`  (or svelte / vue / solid — Astro supports all)
+ *   2. Put the component in `src/components/apps/YourApp.tsx`
+ *   3. Create `src/pages/apps/your-app.astro` and mount it:
+ *        <YourApp client:load />
+ *      Only that page ships JavaScript; the CV and gallery stay at zero.
+ *   4. Add an entry to the `apps` array below.
+ *
+ * `status` is here so you can list things honestly while they are in progress.
+ */
+const apps: {
+  title: string;
+  blurb: string;
+  href?: string;
+  status: 'live' | 'in progress' | 'planned';
+}[] = [
+  {
+    title: 'Risk calculator template',
+    blurb:
+      'A worked example: validated numeric inputs, a transparent formula, and a result that states its own uncertainty.',
+    status: 'planned',
+  },
+  {
+    title: 'Spaced-repetition drill',
+    blurb: 'A small medical-education tool for high-yield recall, with progress kept in the browser.',
+    status: 'planned',
+  },
+  {
+    title: 'Cohort explorer',
+    blurb: 'Client-side filtering and plotting over a de-identified sample dataset.',
+    status: 'planned',
+  },
+];
+---
+
+<Base
+  title="Apps"
+  description="Small interactive tools and prototypes for clinical work, medical education, and biomedical research."
+>
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Apps</h1>
+      <p class="lede prose">
+        Small, self-contained tools that run entirely in your browser — nothing you type is sent
+        anywhere. Prototypes for clinical workflows, teaching aids, and research utilities.
+      </p>
+    </header>
+
+    <ul class="index-list">
+      {
+        apps.map((app, i) => (
+          <li>
+            <div class="index-row app-row">
+              <span class="index-num">{String(i + 1).padStart(2, '0')}</span>
+              <span>
+                {app.href ? <a href={app.href}>{app.title}</a> : app.title}
+                <span class="blurb">{app.blurb}</span>
+              </span>
+              <span class="index-meta status" data-status={app.status}>
+                {app.status}
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="disclaimer prose">
+      Anything here is a prototype for education and exploration. None of it is a medical device,
+      none of it has been validated for clinical use, and none of it should inform the care of a
+      real patient.
+    </p>
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head .display {
+    margin-bottom: 1rem;
+  }
+
+  .page-head .lede {
+    margin: 0;
+  }
+
+  .index-list {
+    max-width: 52rem;
+  }
+
+  .app-row {
+    align-items: start;
+  }
+
+  .blurb {
+    display: block;
+    margin-top: 0.3rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.55;
+    color: var(--ink-muted);
+    max-width: 40ch;
+  }
+
+  .status {
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+  }
+
+  .status[data-status='live'] {
+    color: var(--accent);
+  }
+
+  .disclaimer {
+    margin-top: 3rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink-faint);
+  }
+</style>

@@ -1,0 +1,506 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, socials, emailDisplay } from '../data/site';
+import { headline, cvSections, authorNames } from '../data/cv';
+import Seal from '../components/Seal.astro';
+import { externalAttrs, isExternal } from '../lib/links';
+
+const updated = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+const escapeHtml = (value: string) =>
+  value.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!
+  );
+
+/**
+ * Bold the CV owner's own name in author lists — the standard convention.
+ * Longest name variants are tried first so 'Li JW' wins over 'Li J'.
+ */
+const namePattern = new RegExp(
+  `(${[...authorNames]
+    .sort((a, b) => b.length - a.length)
+    .map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|')})`,
+  'g'
+);
+
+const withBoldAuthor = (authors: string) =>
+  escapeHtml(authors).replace(namePattern, '<strong>$1</strong>');
+
+/** '2025;5(1)' when both are present, otherwise whichever one is. */
+const citationTail = (year?: string | number, detail?: string) =>
+  year && detail ? `${year};${detail}` : String(year ?? detail ?? '');
+---
+
+<Base title="CV" description={`Curriculum vitae for ${site.name}.`}>
+  <article class="wrap cv">
+    <header class="masthead">
+      <div class="namerow">
+        <h1 class="name">{site.name}</h1>
+        <Seal size={72} class="masthead-seal" />
+      </div>
+      <p class="headline">{headline}</p>
+      <ul class="contact">
+        {site.location && <li class="place">{site.location}</li>}
+        <li class="place">{emailDisplay}</li>
+        {
+          socials.map((s) => (
+            <li>
+              <a href={s.href} {...externalAttrs(s.href)}>
+                {s.label}
+                {isExternal(s.href) && <span class="visually-hidden"> (opens in a new tab)</span>}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="updated label">Updated {updated}</p>
+      <button class="print-button no-print" type="button" id="print-cv">
+        Print / save as PDF
+      </button>
+    </header>
+
+    <nav class="jump no-print" aria-label="CV sections">
+      {cvSections.map((section) => <a href={`#${section.id}`}>{section.heading}</a>)}
+    </nav>
+
+    {
+      cvSections.map((section) => (
+        <section id={section.id} class="cv-section">
+          <div class="section-rule">
+            <h2 class="label">{section.heading}</h2>
+          </div>
+
+          {section.kind === 'entries' && (
+            <div class="entries">
+              {section.entries.map((entry) => (
+                <div class="entry">
+                  <div class="period">{entry.period}</div>
+                  <div class="body">
+                    <h3 class="entry-title">
+                      {entry.href ? (
+                        <a href={entry.href} {...externalAttrs(entry.href)}>
+                          {entry.title}
+                          {isExternal(entry.href) && (
+                            <span class="visually-hidden"> (opens in a new tab)</span>
+                          )}
+                        </a>
+                      ) : (
+                        entry.title
+                      )}
+                    </h3>
+                    {(entry.org || entry.location) && (
+                      <p class="org">
+                        {entry.org}
+                        {entry.org && entry.location && <span class="sep"> · </span>}
+                        {entry.location}
+                      </p>
+                    )}
+                    {entry.advisor && <p class="advisor">Advisor: {entry.advisor}</p>}
+                    {entry.detail && entry.detail.length > 0 && (
+                      <ul class="detail">
+                        {entry.detail.map((d) => (
+                          <li>{d}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {entry.links && entry.links.length > 0 && (
+                      <p class="entry-links">
+                        {entry.links.map((link) => (
+                          <a href={link.href} {...externalAttrs(link.href)}>
+                            {link.label}
+                            {isExternal(link.href) && (
+                              <span class="visually-hidden"> (opens in a new tab)</span>
+                            )}
+                          </a>
+                        ))}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {section.kind === 'publications' && (
+            <ol class="pubs">
+              {section.items.map((p) => (
+                <li class="pub">
+                  <span class="authors" set:html={withBoldAuthor(p.authors)} />{' '}
+                  {p.href ? (
+                    <a href={p.href} class="pub-title" {...externalAttrs(p.href)}>
+                      {p.title}
+                      {isExternal(p.href) && (
+                        <span class="visually-hidden"> (opens in a new tab)</span>
+                      )}
+                    </a>
+                  ) : (
+                    <span class="pub-title">{p.title}</span>
+                  )}{' '}
+                  {section.style === 'article' ? (
+                    <span><span class="venue">{p.venue}</span>{`. ${citationTail(p.year, p.detail)}.`}</span>
+                  ) : (
+                    <span>Presented at: <span class="venue">{p.venue}</span>{p.detail ? `; ${p.detail}.` : '.'}</span>
+                  )}
+                  {p.note && <span class="note"> {p.note}</span>}
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {section.kind === 'skills' && (
+            <dl class="skills">
+              {section.groups.map((g) => (
+                <div class="skill-row">
+                  <dt>{g.group}</dt>
+                  <dd>{g.items.join(', ')}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+      ))
+    }
+  </article>
+</Base>
+
+<script>
+  document.getElementById('print-cv')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .cv {
+    max-width: 52rem;
+  }
+
+  /* ---- Masthead ---- */
+
+  .masthead {
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--rule-strong);
+  }
+
+  .namerow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .masthead-seal {
+    /* Optically aligned to the cap height of the name rather than its box. */
+    margin-top: 0.15em;
+  }
+
+  @media (max-width: 34rem) {
+    .masthead-seal {
+      width: 52px;
+      height: 52px;
+    }
+  }
+
+  .name {
+    font-size: var(--step-5);
+    letter-spacing: -0.03em;
+    font-weight: 400;
+  }
+
+  .headline {
+    margin: 0.9rem 0 1.25rem;
+    font-size: var(--step-0);
+    line-height: 1.5;
+    color: var(--ink-muted);
+    max-width: 46rem;
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .contact li {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--ink-muted);
+  }
+
+  .contact a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .contact a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .place {
+    color: var(--ink-faint);
+  }
+
+  .updated {
+    margin: 1.1rem 0 0;
+  }
+
+  .print-button {
+    margin-top: 1.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0.9rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--rule-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+  }
+
+  .print-button:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ---- Section index ---- */
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 1.1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .jump a {
+    font-family: var(--font-sans);
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-faint);
+    text-decoration: none;
+  }
+
+  .jump a:hover {
+    color: var(--accent);
+  }
+
+  /* ---- Sections ---- */
+
+  .cv-section {
+    margin-top: 3rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .entries {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  /* Two columns on desktop: a date rail, then the entry. Collapses to a
+     single stacked column below 46rem so nothing gets squeezed on a phone. */
+  .entry {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 0.25rem 1.5rem;
+    break-inside: avoid;
+  }
+
+  @media (max-width: 46rem) {
+    .entry {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .period {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.3rem;
+  }
+
+  .entry-title {
+    font-size: var(--step-1);
+    font-weight: 500;
+  }
+
+  .org {
+    margin: 0.15rem 0 0;
+    color: var(--ink-muted);
+    font-size: var(--step-0);
+    line-height: 1.45;
+  }
+
+  .sep {
+    color: var(--ink-faint);
+  }
+
+  .advisor {
+    margin: 0.3rem 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .detail {
+    margin: 0.55rem 0 0;
+    padding-left: 1.05rem;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .detail li {
+    font-size: var(--step--1);
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .detail li::marker {
+    color: var(--ink-faint);
+  }
+
+  .entry-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.7rem 0 0;
+  }
+
+  .entry-links a {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    letter-spacing: 0.02em;
+    padding: 0.28rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--ink-muted);
+  }
+
+  .entry-links a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ---- Publications ---- */
+
+  .pubs {
+    margin: 0;
+    padding-left: 1.6rem;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .pub {
+    line-height: 1.55;
+    font-size: var(--step--1);
+    break-inside: avoid;
+  }
+
+  .pub::marker {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+
+  .authors {
+    color: var(--ink-muted);
+  }
+
+  .authors :global(strong) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .pub-title {
+    font-weight: 500;
+  }
+
+  .venue {
+    font-style: italic;
+    color: var(--ink-muted);
+  }
+
+  .note {
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+  }
+
+  /* ---- Skills ---- */
+
+  .skills {
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .skill-row {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 0.25rem 1.5rem;
+  }
+
+  @media (max-width: 46rem) {
+    .skill-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .skill-row dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+  }
+
+  .skill-row dd {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  /* ---- Print ----
+     Tighter rhythm, and external links get their URL spelled out since a
+     printed page cannot be clicked. */
+  @media print {
+    .cv {
+      max-width: none;
+    }
+    .cv-section {
+      margin-top: 1.4rem;
+    }
+    .entries {
+      gap: 0.8rem;
+    }
+    .pubs {
+      gap: 0.6rem;
+    }
+    .masthead {
+      padding-bottom: 0.9rem;
+    }
+    .headline {
+      margin: 0.5rem 0 0.7rem;
+    }
+    .entry-title {
+      font-size: 11pt;
+    }
+    .body a[href^='http']::after,
+    .pub a[href^='http']::after {
+      content: ' (' attr(href) ')';
+      font-size: 7.5pt;
+      color: #555;
+      word-break: break-all;
+    }
+    .entry-links {
+      display: none;
+    }
+    .masthead-seal {
+      width: 56px;
+      height: 56px;
+    }
+  }
+</style>

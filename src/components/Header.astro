@@ -1,0 +1,78 @@
+---
+import { site, nav } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
+---
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="wordmark" href="/" aria-label={`${site.name} — home`}>{site.name}</a>
+    <nav aria-label="Primary">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 1.1rem;
+  }
+
+  .wordmark {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav a {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding-block: 0.15rem;
+    border-bottom: 1px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--ink);
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+</style>

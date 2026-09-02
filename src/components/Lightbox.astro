@@ -1,0 +1,198 @@
+---
+/**
+ * Full-screen photo viewer. No dependencies.
+ *
+ * Uses a native <dialog>, which gets Escape-to-close, focus trapping, and the
+ * top layer for free. It binds to any element on the page carrying
+ * `data-photo`, reading the large image URL and caption from data attributes,
+ * so the gallery markup stays plain and this stays reusable.
+ */
+---
+
+<dialog class="lb" aria-label="Photograph viewer">
+  <button class="lb-btn lb-close" data-lb-close aria-label="Close viewer">&times;</button>
+  <button class="lb-btn lb-prev" data-lb-prev aria-label="Previous photograph">&#8249;</button>
+  <button class="lb-btn lb-next" data-lb-next aria-label="Next photograph">&#8250;</button>
+
+  <figure class="lb-figure">
+    <img data-lb-img alt="" />
+    <figcaption class="lb-cap">
+      <span data-lb-text></span>
+      <span class="lb-count" data-lb-count></span>
+    </figcaption>
+  </figure>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.lb');
+  const triggers = Array.from(document.querySelectorAll<HTMLElement>('[data-photo]'));
+
+  if (dialog && triggers.length > 0) {
+    const img = dialog.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const text = dialog.querySelector<HTMLElement>('[data-lb-text]')!;
+    const count = dialog.querySelector<HTMLElement>('[data-lb-count]')!;
+
+    let index = 0;
+
+    const show = (i: number) => {
+      // Wrap around at both ends.
+      index = (i + triggers.length) % triggers.length;
+      const el = triggers[index];
+      img.src = el.dataset.full ?? '';
+      img.alt = el.dataset.alt ?? '';
+      const caption = [el.dataset.caption, el.dataset.location, el.dataset.date]
+        .filter(Boolean)
+        .join(' · ');
+      text.textContent = caption;
+      count.textContent = `${index + 1} / ${triggers.length}`;
+    };
+
+    const open = (i: number) => {
+      show(i);
+      dialog.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    };
+
+    const close = () => dialog.close();
+
+    triggers.forEach((el, i) => {
+      el.addEventListener('click', (event) => {
+        event.preventDefault();
+        open(i);
+      });
+    });
+
+    dialog.addEventListener('close', () => {
+      document.documentElement.style.overflow = '';
+      // Return focus to the thumbnail the viewer was opened from.
+      triggers[index]?.focus();
+    });
+
+    dialog.querySelector('[data-lb-close]')!.addEventListener('click', close);
+    dialog.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(index - 1));
+    dialog.querySelector('[data-lb-next]')!.addEventListener('click', () => show(index + 1));
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') show(index + 1);
+      if (event.key === 'ArrowLeft') show(index - 1);
+    });
+
+    // Click the backdrop (but not the image or controls) to dismiss.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) close();
+    });
+
+    // Horizontal swipe on touch devices.
+    let startX = 0;
+    dialog.addEventListener(
+      'touchstart',
+      (event) => {
+        startX = event.changedTouches[0].clientX;
+      },
+      { passive: true }
+    );
+    dialog.addEventListener(
+      'touchend',
+      (event) => {
+        const dx = event.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 50) show(dx < 0 ? index + 1 : index - 1);
+      },
+      { passive: true }
+    );
+  }
+</script>
+
+<style>
+  .lb {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    max-height: 100svh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #f4f1ec;
+    overflow: hidden;
+  }
+
+  .lb::backdrop {
+    background: rgba(12, 10, 8, 0.94);
+  }
+
+  .lb-figure {
+    margin: 0;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 0.9rem;
+    padding: clamp(1rem, 4vw, 3rem) clamp(1rem, 4vw, 4.5rem);
+    place-items: center;
+  }
+
+  .lb-figure img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .lb-cap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: #b9b2a8;
+    text-align: center;
+  }
+
+  .lb-count {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+
+  .lb-btn {
+    position: fixed;
+    z-index: 2;
+    background: transparent;
+    border: 0;
+    color: #f4f1ec;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.65;
+    transition: opacity var(--transition);
+    /* Comfortable tap target on phones. */
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .lb-btn:hover,
+  .lb-btn:focus-visible {
+    opacity: 1;
+  }
+
+  .lb-close {
+    top: 0.75rem;
+    right: 0.9rem;
+    font-size: 2rem;
+  }
+
+  .lb-prev,
+  .lb-next {
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+  }
+
+  .lb-prev {
+    left: 0.4rem;
+  }
+
+  .lb-next {
+    right: 0.4rem;
+  }
+</style>

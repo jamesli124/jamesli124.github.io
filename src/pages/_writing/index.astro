@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/**
+ * STUB — structure only.
+ *
+ * When you want this for real, the idiomatic Astro route is a content
+ * collection: create `src/content/writing/*.md` with frontmatter (title, date,
+ * summary, tags), define the schema in `src/content.config.ts`, then replace
+ * the hard-coded `posts` array below with `await getCollection('writing')` and
+ * add `src/pages/writing/[...slug].astro` to render each entry.
+ */
+const posts: { title: string; summary: string; date: string; href?: string }[] = [];
+---
+
+<Base
+  title="Writing"
+  description="Notes and essays on artificial intelligence in clinical medicine."
+>
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Writing</h1>
+      <p class="lede prose">
+        Notes on where machine learning is genuinely useful in clinical care, where it is
+        oversold, and what would have to be true for the difference to be obvious.
+      </p>
+    </header>
+
+    {
+      posts.length === 0 ? (
+        <p class="empty prose">Nothing published yet.</p>
+      ) : (
+        <ul class="index-list">
+          {posts.map((post, i) => (
+            <li>
+              <a href={post.href}>
+                <span class="index-num">{String(i + 1).padStart(2, '0')}</span>
+                <span>{post.title}</span>
+                <span class="index-meta">{post.date}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</Base>
+
+<style>
+  .page-head {
+    padding-bottom: 2.25rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-head .display {
+    margin-bottom: 1rem;
+  }
+
+  .page-head .lede {
+    margin: 0;
+  }
+
+  .empty {
+    color: var(--ink-muted);
+  }
+</style>

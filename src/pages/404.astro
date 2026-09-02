@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Not found" description="That page does not exist.">
+  <div class="wrap notfound">
+    <p class="label">Error 404</p>
+    <h1 class="display">Nothing here.</h1>
+    <p class="lede">That page does not exist, or it moved.</p>
+    <p><a href="/">Back to the front page</a></p>
+  </div>
+</Base>
+
+<style>
+  .notfound {
+    padding-block: clamp(2rem, 1rem + 5vw, 6rem);
+    max-width: 40rem;
+  }
+  .notfound .label {
+    margin-bottom: 1rem;
+  }
+  .notfound .display {
+    margin-bottom: 1rem;
+  }
+</style>
