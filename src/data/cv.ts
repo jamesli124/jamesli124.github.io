@@ -214,8 +214,7 @@ export const cvSections: CVSection[] = [
       {
         authors: 'Li JW, Bandaru R, Baliga K, Liu Y.',
         title:
-          'FinaleToolkit: Open Infrastructure for Reproducible cfDNA Fragmentomics
-',
+          'FinaleToolkit: Open Infrastructure for Reproducible cfDNA Fragmentomics',
         venue: '2026 Lewis Landsberg Research Day',
         detail: 'September 10, 2026; Chicago, IL, USA',
       },
