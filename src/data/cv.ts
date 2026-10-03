@@ -212,6 +212,14 @@ export const cvSections: CVSection[] = [
     style: 'presentation',
     items: [
       {
+        authors: 'Li JW, Bandaru R, Baliga K, Liu Y.',
+        title:
+          'FinaleToolkit: Open Infrastructure for Reproducible cfDNA Fragmentomics
+',
+        venue: '2026 Lewis Landsberg Research Day',
+        detail: 'September 10, 2026; Chicago, IL, USA',
+      },
+      {
         authors: 'Calhoun B, Henslee E, Li J.',
         title: 'University makerspaces with helping and assistive design in mind.',
         venue: 'ISAM 2024',
@@ -222,13 +230,13 @@ export const cvSections: CVSection[] = [
         title:
           'FinaleToolkit: accelerating cell-free DNA fragmentation analysis with a high-speed computational toolkit.',
         venue: 'ISMB 2024',
-        detail: 'July 12–16, 2024; Montreal, Canada',
+        detail: 'July 12–16, 2024; Montreal, QC, Canada',
       },
       {
         authors: 'Li JW, Liu Y.',
         title: 'FinaleTools: fragmentomics toolkit for cell-free DNA analysis.',
         venue: 'URECA Day 2023',
-        detail: 'August 22, 2023; Winston-Salem, NC',
+        detail: 'August 22, 2023; Winston-Salem, NC, USA',
       },
       {
         authors: 'Li JW, Liu Y.',
